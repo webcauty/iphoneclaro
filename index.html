@@ -12,7 +12,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #fef7f5; padding-bottom: 80px; }
-        :root { --claro-red: #E31837; --claro-red-dark: #b8102a; }
+        :root { --claro-red: #E31837; --claro-red-dark: #b8102a; --claro-gold: #ffb347; --shadow-sm: 0 8px 20px rgba(0,0,0,0.08); --shadow-md: 0 12px 28px rgba(0,0,0,0.12); }
         .top-bar { background: var(--claro-red); color: white; padding: 0.5rem 1rem; font-size: 0.7rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
         .main-header { background: white; padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 2px solid var(--claro-red); }
         .logo img { height: 48px; width: auto; max-width: 160px; object-fit: contain; }
@@ -22,12 +22,13 @@
         .container { max-width: 1400px; margin: 1.2rem auto; padding: 0 1rem; }
         .section-title { margin-bottom: 1.2rem; border-left: 5px solid var(--claro-red); padding-left: 1rem; }
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-        .product-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 1px solid #ffd9d9; display: flex; flex-direction: column; height: 100%; }
+        .product-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 1px solid #ffd9d9; display: flex; flex-direction: column; height: 100%; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
         .gallery-container { padding: 0.6rem; border-bottom: 1px solid #ffefef; }
         .main-image { width: 100%; height: 150px; object-fit: cover; border-radius: 14px; cursor: pointer; }
         .thumbnail-list { display: flex; gap: 0.3rem; margin-top: 0.5rem; justify-content: center; flex-wrap: wrap; }
-        .thumbnail { width: 38px; height: 38px; object-fit: cover; border-radius: 10px; cursor: pointer; border: 2px solid transparent; opacity: 0.8; }
-        .thumbnail.active { border-color: var(--claro-red); opacity: 1; }
+        .thumbnail { width: 38px; height: 38px; object-fit: cover; border-radius: 10px; cursor: pointer; border: 2px solid transparent; opacity: 0.8; transition: all 0.2s; }
+        .thumbnail.active { border-color: var(--claro-red); opacity: 1; transform: scale(1.05); }
         .card-info { padding: 0.7rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .product-title { font-size: 0.95rem; font-weight: 800; text-align: center; margin-bottom: 4px; min-height: 2.4rem; }
         .specs { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; justify-content: center; }
@@ -36,7 +37,7 @@
         .old-price { font-size: 0.75rem; color: #888; text-decoration: line-through; }
         .new-price { font-size: 1.1rem; font-weight: 800; color: var(--claro-red-dark); }
         .btn-add { background: var(--claro-red); color: white; border: none; width: 100%; padding: 8px 0; border-radius: 40px; font-weight: 700; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: auto; transition: 0.2s; }
-        .btn-add:hover { background: var(--claro-red-dark); }
+        .btn-add:hover { background: var(--claro-red-dark); transform: scale(1.02); }
         .cart-floating { position: fixed; bottom: 20px; right: 20px; background: var(--claro-red); width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(227,24,55,0.5); z-index: 1100; border: 2px solid white; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(227,24,55,0.7); } 70% { box-shadow: 0 0 0 10px rgba(227,24,55,0); } 100% { box-shadow: 0 0 0 0 rgba(227,24,55,0); } }
         .cart-floating i { font-size: 1.6rem; color: white; }
@@ -48,63 +49,68 @@
         .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0e0e0; padding: 0.8rem 0; }
         .cart-item-info h4 { font-size: 0.9rem; }
         .cart-item-actions { display: flex; gap: 8px; align-items: center; }
-        .cart-item-actions button { background: #f5f5f5; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; }
+        .cart-item-actions button { background: #f5f5f5; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .cart-item-actions button:hover { background: #e0e0e0; }
         .cart-item-actions button.remove-item { background: #ffe6e6; color: var(--claro-red); width: auto; padding: 0 8px; border-radius: 30px; }
         .drawer-total { padding: 1rem; border-top: 2px solid #ffd9d9; font-weight: 800; display: flex; justify-content: space-between; }
         .empty-cart { text-align: center; padding: 2rem; color: #888; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1250; display: none; }
         .overlay.active { display: block; }
         footer { background: #2c2c3a; color: #dddddd; text-align: center; padding: 1.2rem; margin-top: 1.5rem; font-size: 0.7rem; border-top: 4px solid var(--claro-red); }
-        .lightbox, .promo-modal, .gift-modal, .policy-modal, .warning-modal, .checkout-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.2s; }
-        .lightbox.active, .promo-modal.active, .gift-modal.active, .policy-modal.active, .warning-modal.active, .checkout-modal.active { visibility: visible; opacity: 1; }
-        .lightbox-content, .promo-content, .gift-content, .policy-content, .warning-content, .checkout-container {
-            background: white; width: 90%; max-width: 550px; border-radius: 32px; padding: 2rem; position: relative; animation: scaleIn 0.3s ease; max-height: 90vh; overflow-y: auto; }
-        .policy-content { max-width: 750px; }
-        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .lightbox, .promo-modal, .gift-modal, .policy-modal, .checkout-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 2000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: visibility 0.2s, opacity 0.2s; }
+        .lightbox.active, .promo-modal.active, .gift-modal.active, .policy-modal.active, .checkout-modal.active { visibility: visible; opacity: 1; }
+        .lightbox-content, .promo-content, .gift-content, .policy-content { background: white; width: 90%; max-width: 550px; border-radius: 32px; padding: 2rem; position: relative; animation: scaleIn 0.3s ease; max-height: 90vh; overflow-y: auto; }
+        .checkout-container {
+            background: white; width: 90%; max-width: 680px; border-radius: 44px; padding: 1.8rem; position: relative; animation: fadeSlideUp 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1); max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-md);
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
         .lightbox-content { max-width: 1000px; padding: 0; background: transparent; }
         .lightbox-image { width: 100%; max-height: 80vh; object-fit: contain; border-radius: 12px; }
-        .lightbox-close, .lightbox-prev, .lightbox-next { position: absolute; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2101; }
+        .lightbox-close, .lightbox-prev, .lightbox-next { position: absolute; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 48px; height: 48px; font-size: 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2101; transition: 0.2s; }
+        .lightbox-close:hover, .lightbox-prev:hover, .lightbox-next:hover { background: rgba(0,0,0,0.9); transform: scale(1.05); }
         .lightbox-close { top: 20px; right: 20px; }
         .lightbox-prev { left: 15px; top: 50%; transform: translateY(-50%); }
         .lightbox-next { right: 15px; top: 50%; transform: translateY(-50%); }
         .lightbox-counter { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: white; background: rgba(0,0,0,0.5); width: fit-content; margin: 0 auto; padding: 6px 14px; border-radius: 40px; font-size: 0.85rem; }
-        .modal-header-logo { text-align: center; margin-bottom: 1.5rem; }
-        .modal-header-logo img { height: 60px; width: auto; margin-bottom: 0.5rem; }
-        .payment-options { margin: 1rem 0; padding: 0.5rem; background: #f9f9f9; border-radius: 20px; }
-        .payment-option { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; cursor: pointer; padding: 8px; border-radius: 16px; }
-        .payment-option.selected { background: #ffe0e0; border: 1px solid var(--claro-red); }
-        .payment-breakdown { background: #fef1e6; border-radius: 16px; padding: 0.8rem; margin: 0.8rem 0; font-size: 0.85rem; }
-        .breakdown-item { display: flex; justify-content: space-between; margin-bottom: 6px; }
-        .form-field { margin-bottom: 1rem; }
-        .form-field label { font-weight: 600; display: block; margin-bottom: 5px; font-size: 0.85rem; }
-        .form-field input, .form-field textarea { width: 100%; padding: 12px; border-radius: 16px; border: 1px solid #ddd; font-family: inherit; }
-        .file-label { background: #f2f2f2; border-radius: 16px; padding: 10px; text-align: center; cursor: pointer; border: 1px dashed var(--claro-red); }
-        .btn-pagar-final { background: var(--claro-red); width: 100%; border: none; padding: 14px; border-radius: 50px; color: white; font-weight: 800; cursor: pointer; margin-top: 1rem; }
-        .nequi-box { background: #fef1e6; border-radius: 20px; padding: 1rem; text-align: center; margin: 1rem 0; }
-        .nequi-number { font-size: 1.6rem; font-weight: 800; background: white; display: inline-block; padding: 0.3rem 1rem; border-radius: 60px; margin: 8px 0; font-family: monospace; }
-        .btn-copy { background: var(--claro-red); border: none; color: white; padding: 6px 16px; border-radius: 40px; cursor: pointer; }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #888; background: rgba(0,0,0,0.05); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .btn-share { background: #25D366; color: white; border: none; padding: 10px 0; border-radius: 40px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 1rem auto 0.5rem; width: 80%; transition: 0.2s; }
-        .btn-share:hover { background: #128C7E; }
-        .promo-buttons { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 20px; }
-        /* Ajuste específico para el badge de descuento en el modal */
-        .discount-badge {
-            display: inline-block;
-            background: #ffd966;
-            padding: 0.4rem 1.2rem;
-            border-radius: 60px;
-            font-weight: bold;
-            margin: 0.5rem 0 1rem 0;
-        }
-        .promo-content p {
-            margin-bottom: 0.25rem;
-        }
+        .modal-header-logo { text-align: center; margin-bottom: 1.2rem; }
+        .modal-header-logo img { height: 50px; width: auto; margin-bottom: 0.5rem; }
+        .payment-methods { display: flex; gap: 15px; margin-bottom: 24px; }
+        .payment-card { flex: 1; background: #f8fafc; border-radius: 28px; padding: 16px 8px; text-align: center; cursor: pointer; transition: all 0.25s ease; border: 2px solid transparent; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+        .payment-card.selected { background: linear-gradient(145deg, #fff0f0, #ffe6e6); border-color: var(--claro-red); box-shadow: 0 10px 20px rgba(227,24,55,0.15); transform: translateY(-2px); }
+        .payment-logo { width: 60px; height: 60px; object-fit: contain; margin: 0 auto 8px; display: block; }
+        .payment-card strong { display: block; font-size: 1rem; margin-bottom: 4px; }
+        .payment-card small { font-size: 0.7rem; color: #5a6e7c; }
+        .info-box { background: #f0f4ff; border-radius: 24px; padding: 12px; text-align: center; margin-bottom: 8px; }
+        .copy-key { background: white; border-radius: 60px; padding: 8px 16px; font-family: monospace; font-weight: 700; display: inline-flex; align-items: center; gap: 12px; margin: 8px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .btn-copy-small { background: var(--claro-red); border: none; color: white; border-radius: 40px; padding: 4px 14px; font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .payment-breakdown { background: #fef7e8; border-radius: 24px; padding: 14px; margin: 16px 0; font-size: 0.85rem; border-left: 4px solid var(--claro-gold); }
+        .breakdown-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 500; }
+        .form-field { margin-bottom: 16px; }
+        .form-field label { font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.8rem; color: #1e2a36; }
+        .form-field input, .form-field textarea { width: 100%; padding: 12px 16px; border-radius: 28px; border: 1px solid #e2e8f0; font-family: inherit; transition: all 0.2s; background: #fefefe; font-size: 0.9rem; }
+        .form-field input:focus, .form-field textarea:focus { outline: none; border-color: var(--claro-red); box-shadow: 0 0 0 3px rgba(227,24,55,0.1); }
+        .file-label { background: #f1f5f9; border-radius: 28px; padding: 12px 16px; text-align: center; cursor: pointer; border: 1px dashed var(--claro-red); margin-top: 4px; }
+        .btn-submit-form { background: linear-gradient(95deg, #1e2a36, #0f172a); color: white; border: none; padding: 14px; border-radius: 60px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 0.95rem; transition: 0.2s; width: 100%; margin-top: 8px; }
+        .btn-submit-form:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); background: linear-gradient(95deg, #0f1a24, #0a0f17); }
+        .close-modal { position: absolute; top: 18px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #94a3b8; background: rgba(0,0,0,0.05); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .close-modal:hover { background: rgba(0,0,0,0.1); color: var(--claro-red); transform: rotate(90deg); }
+        .btn-share { background: #25D366; color: white; border: none; padding: 8px 0; border-radius: 40px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0.5rem auto; width: 70%; transition: 0.2s; }
         .gift-options { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
-        .gift-option { background: #f5f5f5; border-radius: 20px; padding: 1rem; cursor: pointer; border: 2px solid transparent; }
+        .gift-option { background: #f5f5f5; border-radius: 20px; padding: 1rem; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .gift-option.selected { background: #ffe0e0; border-color: var(--claro-red); }
-        .btn-select-gift { background: var(--claro-red); color: white; border: none; padding: 12px; border-radius: 40px; font-weight: bold; width: 100%; cursor: pointer; }
-        @media (max-width: 640px) { .product-grid { gap: 0.8rem; } .main-image { height: 120px; } .thumbnail { width: 32px; height: 32px; } .lightbox-prev, .lightbox-next { width: 40px; height: 40px; font-size: 1.5rem; } .btn-share { width: 100%; } }
+        .promo-content { text-align: center; }
+        .promo-badge { background: gold; color: #b8102a; display: inline-block; padding: 5px 14px; border-radius: 40px; font-weight: 800; font-size: 0.75rem; margin-bottom: 1rem; }
+        .highlight-nequi { background: #f0f4ff; padding: 10px; border-radius: 50px; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0.8rem 0; font-weight: 600; font-size: 0.85rem; }
+        .payment-details { background: #ffffff; border-radius: 28px; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); border: 1px solid #edf2f7; }
+        @media (max-width: 640px) { .product-grid { gap: 0.8rem; } .main-image { height: 120px; } .thumbnail { width: 32px; height: 32px; } .checkout-container { padding: 1.2rem; } .payment-methods { flex-direction: column; gap: 10px; } .payment-logo { width: 50px; height: 50px; } }
         @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 1200px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
     </style>
@@ -112,10 +118,10 @@
 <body>
 <div class="top-bar">
     <div><i class="fas fa-map-marker-alt"></i> Claro Colombia | Envíos gratis</div>
-    <div><i class="fas fa-credit-card"></i> Aceptamos todas las tarjetas y medio de pago oficial Nequi</div>
+    <div><i class="fas fa-credit-card"></i> Aceptamos Nequi / BRE-B y pago contra entrega</div>
 </div>
 <div class="main-header">
-    <div class="logo"><img src="https://i.ibb.co/W4CNRJJh/pngwing-com.png" alt="Claro Colombia Logo"></div>
+    <div class="logo"><img src="https://i.ibb.co/W4CNRJJh/pngwing-com.png" alt="Claro Colombia Logo" loading="eager"></div>
 </div>
 <div class="hero">
     <h2>📱 <span>iPhone 17 y más</span> · 20% OFF + Regalo Exclusivo</h2>
@@ -130,96 +136,81 @@
     <a href="mailto:claroiphone@mbox.re"><i class="fas fa-envelope"></i> Servicio al cliente: claroiphone@mbox.re</a></p>
 </footer>
 
-<!-- Lightbox -->
+<!-- Lightbox, promo, gift, policy modales -->
 <div id="lightbox" class="lightbox"><div class="lightbox-content"><img id="lightboxImg" class="lightbox-image"><button id="lightboxClose" class="lightbox-close">&times;</button><button id="lightboxPrev" class="lightbox-prev"><i class="fas fa-chevron-left"></i></button><button id="lightboxNext" class="lightbox-next"><i class="fas fa-chevron-right"></i></button><div id="lightboxCounter" class="lightbox-counter"></div></div></div>
-
-<!-- Modal promoción (20% descuento) con espaciado corregido -->
-<div id="promoModal" class="promo-modal">
-    <div class="promo-content">
-        <span id="closePromoBtn" class="close-modal">&times;</span>
-        <div class="modal-header-logo">
-            <img src="https://i.ibb.co/W4CNRJJh/pngwing-com.png" alt="Logo">
-            <h3>🎉 20% DE DESCUENTO 🎉</h3>
-        </div>
-        <p style="text-align: center;">En todos los productos <strong>solo por este mes</strong></p>
-        <div style="text-align: center;">
-            <div class="discount-badge">¡Aprovecha ahora!</div>
-        </div>
-        <div style="margin: 0.5rem 0; text-align: center; font-size: 0.85rem;"><i class="fas fa-share-alt"></i> ¡Comparte y obtén 5% EXTRA!</div>
-        <div class="promo-buttons">
-            <button id="sharePromoBtn" class="btn-share"><i class="fab fa-whatsapp"></i> Compartir ahora</button>
-            <button id="acceptPromoBtn" class="btn-add" style="width: 80%; margin: 0 auto;">Ver productos</button>
-        </div>
-        <p style="font-size: 0.65rem; color: #555; text-align: center; margin-top: 1rem;">Si compartes con 20 personas, recibirás un código de 5% adicional acumulable.</p>
-    </div>
-</div>
-
-<!-- Modal regalo -->
-<div id="giftModal" class="gift-modal"><div class="gift-content"><span id="closeGiftBtn" class="close-modal">&times;</span><div class="modal-header-logo"><img src="https://i.ibb.co/W4CNRJJh/pngwing-com.png"><h3>🎁 Elige tu regalo</h3></div><div class="gift-options" id="giftOptionsContainer"><div class="gift-option" data-gift="Panini con fichas"><i class="fas fa-book-open"></i><div><strong>Álbum Panini con fichas</strong></div><small>Edición especial mundial</small></div><div class="gift-option" data-gift="Camisa Selección Colombia autografiada"><i class="fas fa-tshirt"></i><div><strong>Camisa de la Selección Colombia</strong></div><small>Autografiada por todo el equipo</small></div><div class="gift-option" data-gift="Balón oficial del mundial"><i class="fas fa-futbol"></i><div><strong>Balón oficial del Mundial</strong></div><small>Edición limitada</small></div></div><button id="confirmGiftBtn" class="btn-select-gift">Añadir regalo y continuar</button></div></div>
-
-<!-- Modal políticas -->
-<div id="policyModal" class="policy-modal"><div class="policy-content"><span id="closePolicyBtn" class="close-modal">&times;</span><div class="modal-header-logo"><img src="https://i.ibb.co/W4CNRJJh/pngwing-com.png"><h3>Políticas de Compra</h3></div><div class="policy-section"><h4><i class="fas fa-truck"></i> Envíos</h4><p>Envíos gratuitos a todo Colombia. Tiempo estimado: 3 a 7 días hábiles.</p></div><div class="policy-section"><h4><i class="fas fa-exchange-alt"></i> Cambios y devoluciones</h4><p>Derecho de retracto: 5 días hábiles. Garantía 1 año.</p></div><div class="policy-section"><h4><i class="fas fa-lock"></i> Privacidad</h4><p>Tus datos son tratados conforme a la Ley 1581 de 2012.</p></div><div class="policy-section"><h4><i class="fas fa-credit-card"></i> Medios de pago</h4><p>Nequi (3202112323) o tarjetas. También pago del 30% anticipado y 70% contra entrega.</p></div><div class="policy-section"><h4><i class="fas fa-building"></i> Información del vendedor</h4><p>Claro Colombia S.A.S - NIT: 900.123.456-7 - Calle 100 # 8A-55, Bogotá. Correo: claroiphone@mbox.re</p></div></div></div>
-
-<!-- Modal advertencia post-pago -->
-<div id="postWarningModal" class="warning-modal"><div class="warning-content"><span id="closeWarningBtn" class="close-modal">&times;</span><div style="text-align: center; background: #ffebee; padding: 1rem; border-radius: 16px;"><i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #b71c1c;"></i><h3 style="color: #b71c1c;">⚠️ Pago realizado y lo estamos verificando ⚠️</h3><p>Validaremos tu pago en un máximo de <strong>24 horas</strong>. Factura descargada.</p><button id="closeWarningActionBtn" class="btn-add" style="background: #b71c1c; margin-top: 1rem;">Entendido</button></div></div></div>
+<div id="promoModal" class="promo-modal"><div class="promo-content"><span id="closePromoBtn" class="close-modal">&times;</span><div class="modal-header-logo"><img src="https://i.ibb.co/W4CNRJJh/pngwing-com.png" loading="eager"><div class="promo-badge"><i class="fas fa-futbol"></i> MODO MUNDIAL 2026</div></div><h2 style="font-size: 1.6rem;">⚽ 20% OFF ⚽</h2><p>en toda la línea iPhone</p><div class="highlight-nequi"><i class="fas fa-mobile-alt"></i><span>✅ Paga con <strong>Nequi o BRE-B</strong> y obtén el 20% de descuento</span><i class="fas fa-check-circle"></i></div><p style="background:#fff0e0; padding:6px; border-radius:30px; font-size:0.8rem;">🎁 Regalo exclusivo + Envío gratis</p><div class="promo-buttons"><button id="sharePromoBtn" class="btn-share"><i class="fab fa-whatsapp"></i> Compartir oferta</button><button id="acceptPromoBtn" class="btn-add" style="width:70%; margin:0 auto;">Ver iPhones</button></div></div></div>
+<div id="giftModal" class="gift-modal"><div class="gift-content"><span id="closeGiftBtn" class="close-modal">&times;</span><div class="modal-header-logo"><img src="https://i.ibb.co/W4CNRJJh/pngwing-com.png" loading="eager"><h3>🎁 Elige tu regalo</h3></div><div class="gift-options"><div class="gift-option" data-gift="Panini con fichas"><i class="fas fa-book-open"></i><div><strong>Álbum Panini con fichas</strong></div><small>Edición especial mundial</small></div><div class="gift-option" data-gift="Camisa Selección Colombia autografiada"><i class="fas fa-tshirt"></i><div><strong>Camisa de la Selección Colombia</strong></div><small>Autografiada por todo el equipo</small></div><div class="gift-option" data-gift="Balón oficial del mundial"><i class="fas fa-futbol"></i><div><strong>Balón oficial del Mundial</strong></div><small>Edición limitada</small></div></div><button id="confirmGiftBtn" class="btn-select-gift" style="background:var(--claro-red); color:white; border:none; padding:12px; border-radius:40px; width:100%; cursor:pointer;">Añadir regalo y continuar</button></div></div>
+<div id="policyModal" class="policy-modal"><div class="policy-content"><span id="closePolicyBtn" class="close-modal">&times;</span><div class="modal-header-logo"><img src="https://i.ibb.co/W4CNRJJh/pngwing-com.png" loading="eager"><h3>Políticas de Compra</h3></div><div class="policy-section"><h4><i class="fas fa-truck"></i> Envíos</h4><p>Envíos gratuitos a todo Colombia. Tiempo estimado: 3 a 7 días hábiles.</p></div><div class="policy-section"><h4><i class="fas fa-exchange-alt"></i> Cambios y devoluciones</h4><p>Derecho de retracto: 5 días hábiles. Garantía 1 año.</p></div><div class="policy-section"><h4><i class="fas fa-lock"></i> Privacidad</h4><p>Tus datos son tratados conforme a la Ley 1581 de 2012.</p></div><div class="policy-section"><h4><i class="fas fa-credit-card"></i> Medios de pago</h4><p>Nequi (3202112323) / BRE-B (llave: @3138237540) o contra entrega (30% anticipo).</p></div></div></div>
 
 <div id="cartFloating" class="cart-floating"><i class="fas fa-shopping-bag"></i><span id="floatingCartCount" class="cart-badge">0</span></div>
 <div id="cartOverlay" class="overlay"></div>
-<div id="cartDrawer" class="cart-drawer">
-    <div class="drawer-header"><span><i class="fas fa-shopping-cart"></i> Mi carrito</span><button id="closeDrawerBtn" class="close-modal">&times;</button></div>
-    <div id="drawerItemsContainer" class="drawer-items"><div class="empty-cart">🛒 Tu carrito está vacío</div></div>
-    <div id="drawerTotal" class="drawer-total" style="display: none;"><span>Total:</span><span id="drawerTotalAmount">$0</span></div>
-    <div style="padding: 1rem;">
-        <button id="checkoutBtnDrawer" class="btn-add" style="background:#1e2a36;"><i class="fas fa-credit-card"></i> Pagar con Nequi / Contra entrega</button>
-    </div>
-</div>
+<div id="cartDrawer" class="cart-drawer"><div class="drawer-header"><span><i class="fas fa-shopping-cart"></i> Mi carrito</span><button id="closeDrawerBtn" class="close-modal">&times;</button></div><div id="drawerItemsContainer" class="drawer-items"><div class="empty-cart">🛒 Tu carrito está vacío</div></div><div id="drawerTotal" class="drawer-total" style="display: none;"><span>Total:</span><span id="drawerTotalAmount">$0</span></div><div style="padding: 1rem;"><button id="checkoutBtnDrawer" class="btn-add" style="background:#1e2a36;"><i class="fas fa-credit-card"></i> Pagar</button></div></div>
 
+<!-- Modal checkout con FormSubmit corregido (limpia carrito y formulario) -->
 <div id="checkoutModal" class="checkout-modal">
     <div class="checkout-container">
         <span id="closeCheckoutBtn" class="close-modal">&times;</span>
-        <h3><i class="fas fa-mobile-alt"></i> Finalizar compra</h3>
-        <div class="nequi-box">
-            <i class="fas fa-dollar-sign"></i> Paga al número de Nequi:<br>
-            <div class="nequi-number">3202112323 <button id="copyNequiBtn" class="btn-copy"><i class="fas fa-copy"></i> Copiar</button></div>
-            <small id="paymentInstruction">Paga el monto total indicado</small>
+        <h3 style="text-align:center; font-size: 1.5rem; margin-bottom: 1.2rem;">Finalizar compra</h3>
+        
+        <div class="payment-methods">
+            <div id="nequiCard" class="payment-card selected">
+                <img src="https://i.ibb.co/Rkzvbqc6/images-2.png" alt="Nequi" class="payment-logo" loading="eager">
+                <strong>Nequi</strong> <small>Pago al instante</small>
+            </div>
+            <div id="brebCard" class="payment-card">
+                <img src="https://i.ibb.co/JWCptNrj/images-5.jpg" alt="BRE-B" class="payment-logo" loading="eager">
+                <strong>BRE-B</strong> <small>Desde cualquier banco</small>
+            </div>
         </div>
-        <div class="payment-options">
-            <div class="payment-option" data-method="full">
-                <input type="radio" name="paymentMethod" value="full" checked> <strong>💰 Pago total con Nequi</strong>
+        
+        <div id="nequiPanel" class="payment-details">
+            <div class="info-box">
+                <div><strong>📱 Número de Nequi</strong></div>
+                <div class="copy-key">3202112323 <button id="copyNequi" class="btn-copy-small"><i class="fas fa-copy"></i> Copiar</button></div>
+                <small>Realiza el pago del monto indicado y adjunta el comprobante abajo.</small>
             </div>
-            <div class="payment-option" data-method="partial">
-                <input type="radio" name="paymentMethod" value="partial"> <strong>📦 Contra entrega (30% ahora, 70% al recibir)</strong>
+        </div>
+        <div id="brebPanel" class="payment-details" style="display: none;">
+            <div class="info-box">
+                <div><strong>🔑 Llave BRE-B</strong></div>
+                <div class="copy-key">@3138237540 <button id="copyBreb" class="btn-copy-small"><i class="fas fa-copy"></i> Copiar</button></div>
+                <div style="background: #e6f7ec; border-radius: 20px; padding: 8px; margin-top: 8px;">
+                    <i class="fas fa-check-circle" style="color: #2e7d32;"></i> 
+                    <strong>Válida para pagar desde cualquier banco de tu preferencia</strong>
+                </div>
             </div>
+        </div>
+        
+        <div style="display: flex; justify-content: center; gap: 24px; margin: 12px 0;">
+            <label style="display: flex; align-items: center; gap: 8px;"><input type="radio" name="paymentMethodRadio" value="full" checked> <strong>💰 Pago total</strong></label>
+            <label style="display: flex; align-items: center; gap: 8px;"><input type="radio" name="paymentMethodRadio" value="partial"> <strong>📦 Contra entrega (30% ahora)</strong></label>
         </div>
         <div id="paymentBreakdown" class="payment-breakdown"></div>
-        <form id="checkoutForm" method="POST" action="https://formsubmit.co/justincortez1621@gmail.com,claroiphone@mbox.re" enctype="multipart/form-data">
-            <input type="hidden" name="_subject" value="NUEVO PEDIDO iPhone - Claro Colombia">
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" id="cartDetailsHidden" name="Detalle del pedido" value="">
-            <input type="hidden" id="cartTotalHidden" name="Total pagado (COP)" value="">
-            <input type="hidden" id="paymentMethodHidden" name="Método de pago" value="full">
-            <input type="hidden" id="balanceDueHidden" name="Saldo pendiente (contra entrega)" value="">
-            <div class="form-field"><label>Nombre completo *</label><input type="text" name="Nombre" required></div>
-            <div class="form-field"><label>Cédula (CC) *</label><input type="text" name="Cedula" required></div>
-            <div class="form-field"><label>Ciudad *</label><input type="text" name="Ciudad" required></div>
-            <div class="form-field"><label>Dirección *</label><input type="text" name="Direccion" required></div>
-            <div class="form-field"><label>Teléfono *</label><input type="tel" name="Telefono" required></div>
-            <div class="form-field"><label>Observaciones (opcional)</label><textarea name="Observaciones" rows="2"></textarea></div>
+        
+        <form id="orderForm" method="POST" enctype="multipart/form-data">
+            <div class="form-field"><label>Nombre completo *</label><input type="text" name="Nombre" id="inputNombre" required></div>
+            <div class="form-field"><label>Cédula (CC) *</label><input type="text" name="Cedula" id="inputCedula" required></div>
+            <div class="form-field"><label>Ciudad *</label><input type="text" name="Ciudad" id="inputCiudad" required></div>
+            <div class="form-field"><label>Dirección *</label><input type="text" name="Direccion" id="inputDireccion" required></div>
+            <div class="form-field"><label>Teléfono *</label><input type="tel" name="Telefono" id="inputTelefono" required></div>
+            <div class="form-field"><label>Observaciones</label><textarea name="Observaciones" id="inputObservaciones" rows="2"></textarea></div>
+            
             <div class="form-field">
-                <label>Comprobante de pago (captura de pantalla) *</label>
-                <input type="file" name="comprobante_pago" accept="image/*" required id="paymentProofInput" style="display:none;">
-                <div class="file-label" id="fakeFileLabel"><i class="fas fa-cloud-upload-alt"></i> Seleccionar imagen del comprobante</div>
-                <small id="proofHint" style="color:#e67e22; display:block; margin-top:5px;">Adjunta el comprobante según el método elegido.</small>
+                <label>📎 Comprobante de pago (captura de pantalla) *</label>
+                <input type="file" name="comprobante" accept="image/*" required id="proofInput" style="display:none;">
+                <div id="fakeFileLabel" class="file-label"><i class="fas fa-cloud-upload-alt"></i> Seleccionar imagen del comprobante</div>
+                <small style="color:#e67e22;">Adjunta el comprobante de tu transferencia (JPG, PNG).</small>
             </div>
-            <button type="submit" class="btn-pagar-final" id="submitPaymentBtn"><i class="fas fa-check-circle"></i> Confirmar pago y enviar</button>
+            
+            <button type="submit" id="submitOrderBtn" class="btn-submit-form"><i class="fas fa-check-circle"></i> Confirmar pago y enviar pedido</button>
         </form>
+        <div style="font-size:0.7rem; text-align:center; margin-top:14px; color:#2e7d32;">Al enviar, se descargará automáticamente tu factura PDF.</div>
     </div>
 </div>
 
 <script>
     (function() {
-        // ==================== CATÁLOGO DE PRODUCTOS ====================
+        // Catálogo de productos (mismo que antes)
         const productsRaw = [
             { name: "iPhone 17e", price: 3999900, pantalla: "6.3 OLED", procesador: "A19", camara: "48 MP Fusion", almacenamiento: "256 GB", año: 2026, orden: 1, imagenes: ["https://i.ibb.co/rK77wKR0/images-1.jpg","https://i.ibb.co/Q7CPmxKb/images-2.jpg"] },
             { name: "iPhone 17 Pro Max", price: 8299900, pantalla: "6.9 OLED 120Hz", procesador: "A19 Pro", camara: "48 MP Triple", almacenamiento: "256 GB", año: 2025, orden: 2, imagenes: ["https://i.ibb.co/4D1z5sg/descarga-1.jpg","https://i.ibb.co/5XQXBRYN/descarga.jpg"] },
@@ -241,464 +232,233 @@
             { name: "iPhone 14", price: 2199900, pantalla: "6.1 OLED", procesador: "A15 Bionic", camara: "12 MP Dual", almacenamiento: "128 GB", año: 2022, orden: 18, imagenes: ["https://http2.mlstatic.com/D_Q_NP_844446-MLA104268834029_012026-B.webp","https://http2.mlstatic.com/D_Q_NP_745264-MLA103741007234_012026-B.webp"] }
         ];
         const DISCOUNT = 0.8;
-        const products = productsRaw.map(p => ({
-            ...p,
-            originalPrice: p.price,
-            priceCOP: Math.round(p.price * DISCOUNT),
-            specsList: [p.pantalla, p.procesador, p.camara, p.almacenamiento]
-        })).sort((a,b) => (a.año !== b.año ? b.año - a.año : a.orden - b.orden));
+        const products = productsRaw.map(p => ({ ...p, originalPrice: p.price, priceCOP: Math.round(p.price * DISCOUNT), specsList: [p.pantalla, p.procesador, p.camara, p.almacenamiento] })).sort((a,b) => (a.año !== b.año ? b.año - a.año : a.orden - b.orden));
         products.forEach((p, i) => p.id = i+1);
-
         let cart = [];
         let pendingProduct = null;
         const LOGO_URL = 'https://i.ibb.co/W4CNRJJh/pngwing-com.png';
-
-        // ========== FUNCIONES AUXILIARES ==========
         function formatCOP(amount) { return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(amount); }
         function saveCart() { localStorage.setItem('claro_cart', JSON.stringify(cart)); }
-        function showToast(msg) {
-            let t = document.createElement('div');
-            t.className = 'toast-message';
-            t.style.cssText = 'position:fixed; bottom:85px; left:50%; transform:translateX(-50%); background:#1e1e2a; color:white; padding:10px 20px; border-radius:40px; z-index:1400; font-size:0.85rem;';
-            t.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`;
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        }
-
-        // ========== CARRITO ==========
-        function updateCartUI() {
-            const totalItems = cart.reduce((a,i) => a + i.quantity, 0);
-            document.getElementById('floatingCartCount').innerText = totalItems;
-            renderDrawer();
-            saveCart();
-            attachCartEvents();
-        }
-        function renderDrawer() {
-            const container = document.getElementById('drawerItemsContainer');
-            const totalDiv = document.getElementById('drawerTotal');
-            const totalSpan = document.getElementById('drawerTotalAmount');
-            if (cart.length === 0) {
-                container.innerHTML = '<div class="empty-cart">🛒 Tu carrito está vacío</div>';
-                totalDiv.style.display = 'none';
-                return;
-            }
-            totalDiv.style.display = 'flex';
-            let html = '', total = 0;
-            cart.forEach(item => {
-                total += item.price * item.quantity;
-                const subtotal = item.price === 0 ? '$0' : formatCOP(item.price * item.quantity);
-                const priceText = item.price === 0 ? 'Gratis' : formatCOP(item.price) + ' c/u';
-                if (item.isGift) {
-                    html += `<div class="cart-item" data-id="${item.id}">
-                                <div class="cart-item-info"><h4>${item.name}</h4><p>${priceText}</p><small>Subtotal: ${subtotal}</small></div>
-                                <div class="cart-item-actions"><span style="background:#f5f5f5; padding:4px 10px; border-radius:20px;">Cantidad: 1</span><button class="remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button></div>
-                            </div>`;
-                } else {
-                    html += `<div class="cart-item" data-id="${item.id}">
-                                <div class="cart-item-info"><h4>${item.name}</h4><p>${priceText}</p><small>Subtotal: ${subtotal}</small></div>
-                                <div class="cart-item-actions"><button class="qty-btn" data-id="${item.id}" data-delta="-1">-</button><span>${item.quantity}</span><button class="qty-btn" data-id="${item.id}" data-delta="1">+</button><button class="remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button></div>
-                            </div>`;
-                }
-            });
-            container.innerHTML = html;
-            totalSpan.innerText = formatCOP(total);
-        }
-        function attachCartEvents() {
-            const container = document.getElementById('drawerItemsContainer');
-            container.querySelectorAll('.qty-btn').forEach(btn => {
-                btn.removeEventListener('click', handleQty);
-                btn.addEventListener('click', handleQty);
-            });
-            container.querySelectorAll('.remove-item').forEach(btn => {
-                btn.removeEventListener('click', handleRemove);
-                btn.addEventListener('click', handleRemove);
-            });
-        }
-        function handleQty(e) {
-            const id = e.currentTarget.getAttribute('data-id');
-            const delta = parseInt(e.currentTarget.getAttribute('data-delta'));
-            const item = cart.find(i => i.id == id);
-            if (item && !item.isGift) {
-                const newQ = item.quantity + delta;
-                if (newQ <= 0) removeItem(id);
-                else { item.quantity = newQ; updateCartUI(); }
-            }
-        }
-        function handleRemove(e) {
-            const id = e.currentTarget.getAttribute('data-id');
-            removeItem(id);
-        }
-        function removeItem(id) {
-            cart = cart.filter(i => i.id != id);
-            updateCartUI();
-        }
-        function hasGift() { return cart.some(i => i.isGift === true); }
-        function addGift(giftName) {
-            if (hasGift()) return;
-            cart.push({ id: 'gift_' + Date.now(), name: `🎁 ${giftName}`, price: 0, quantity: 1, isGift: true });
-            updateCartUI();
-        }
-        function addToCart(product) {
-            if (!hasGift()) {
-                pendingProduct = product;
-                openGiftModal();
-                return;
-            }
-            const existing = cart.find(i => i.id === product.id);
-            if (existing) existing.quantity += 1;
-            else cart.push({ id: product.id, name: product.name, price: product.priceCOP, quantity: 1, isGift: false });
-            updateCartUI();
-            showToast(`${product.name} agregado al carrito`);
-        }
+        function showToast(msg) { let t = document.createElement('div'); t.className = 'toast-message'; t.style.cssText = 'position:fixed; bottom:85px; left:50%; transform:translateX(-50%); background:#1e1e2a; color:white; padding:8px 18px; border-radius:40px; z-index:1400; font-size:0.8rem;'; t.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+        
+        // Funciones carrito
+        function updateCartUI() { const totalItems = cart.reduce((a,i) => a + i.quantity, 0); document.getElementById('floatingCartCount').innerText = totalItems; renderDrawer(); saveCart(); attachCartEvents(); }
+        function renderDrawer() { const container = document.getElementById('drawerItemsContainer'); const totalDiv = document.getElementById('drawerTotal'); const totalSpan = document.getElementById('drawerTotalAmount'); if (cart.length === 0) { container.innerHTML = '<div class="empty-cart">🛒 Tu carrito está vacío</div>'; totalDiv.style.display = 'none'; return; } totalDiv.style.display = 'flex'; let html = '', total = 0; cart.forEach(item => { total += item.price * item.quantity; const subtotal = item.price === 0 ? '$0' : formatCOP(item.price * item.quantity); const priceText = item.price === 0 ? 'Gratis' : formatCOP(item.price); if (item.isGift) html += `<div class="cart-item"><div class="cart-item-info"><h4>${item.name}</h4><p>${priceText}</p><small>Subtotal: ${subtotal}</small></div><div class="cart-item-actions"><span>Cant: 1</span><button class="remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button></div></div>`; else html += `<div class="cart-item"><div class="cart-item-info"><h4>${item.name}</h4><p>${priceText} c/u</p><small>Subtotal: ${subtotal}</small></div><div class="cart-item-actions"><button class="qty-btn" data-id="${item.id}" data-delta="-1">-</button><span>${item.quantity}</span><button class="qty-btn" data-id="${item.id}" data-delta="1">+</button><button class="remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button></div></div>`; }); container.innerHTML = html; totalSpan.innerText = formatCOP(total); }
+        function attachCartEvents() { document.querySelectorAll('.qty-btn').forEach(btn => { btn.removeEventListener('click', handleQty); btn.addEventListener('click', handleQty); }); document.querySelectorAll('.remove-item').forEach(btn => { btn.removeEventListener('click', handleRemove); btn.addEventListener('click', handleRemove); }); }
+        function handleQty(e) { const id = e.currentTarget.getAttribute('data-id'); const delta = parseInt(e.currentTarget.getAttribute('data-delta')); const item = cart.find(i => i.id == id); if (item && !item.isGift) { const newQ = item.quantity + delta; if (newQ <= 0) removeItem(id); else { item.quantity = newQ; updateCartUI(); } } }
+        function handleRemove(e) { removeItem(e.currentTarget.getAttribute('data-id')); }
+        function removeItem(id) { cart = cart.filter(i => i.id != id); updateCartUI(); }
         function clearCart() { cart = []; updateCartUI(); }
-
-        // ========== MODALES ==========
-        const promoModal = document.getElementById('promoModal');
-        const closePromo = document.getElementById('closePromoBtn');
-        const acceptPromo = document.getElementById('acceptPromoBtn');
-        const sharePromo = document.getElementById('sharePromoBtn');
-        function openPromo() { promoModal.classList.add('active'); }
-        function closePromoModal() { promoModal.classList.remove('active'); }
-        closePromo.addEventListener('click', closePromoModal);
-        acceptPromo.addEventListener('click', closePromoModal);
-        promoModal.addEventListener('click', (e) => { if (e.target === promoModal) closePromoModal(); });
-        sharePromo.addEventListener('click', async () => {
-            try {
-                if (navigator.share) await navigator.share({ title: 'Claro Colombia', text: '¡iPhone con 20% OFF!', url: location.href });
-                else await navigator.clipboard.writeText(location.href);
-                showToast('Enlace copiado. Comparte con 20 amigos y obtén 5% extra.');
-            } catch(e) { showToast('No se pudo compartir'); }
-        });
-
-        const giftModal = document.getElementById('giftModal');
-        const closeGift = document.getElementById('closeGiftBtn');
-        const giftOptions = document.querySelectorAll('.gift-option');
-        const confirmGift = document.getElementById('confirmGiftBtn');
-        let selectedGift = null;
-        function openGiftModal() {
-            if (hasGift()) { showToast('Ya tienes un regalo en el carrito.'); pendingProduct = null; return; }
-            giftModal.classList.add('active');
-            selectedGift = null;
-            giftOptions.forEach(opt => opt.classList.remove('selected'));
-        }
+        function hasGift() { return cart.some(i => i.isGift === true); }
+        function addGift(giftName) { if (hasGift()) return; cart.push({ id: 'gift_' + Date.now(), name: `🎁 ${giftName}`, price: 0, quantity: 1, isGift: true }); updateCartUI(); }
+        function addToCart(product) { if (!hasGift()) { pendingProduct = product; openGiftModal(); return; } const existing = cart.find(i => i.id === product.id); if (existing) existing.quantity += 1; else cart.push({ id: product.id, name: product.name, price: product.priceCOP, quantity: 1, isGift: false }); updateCartUI(); showToast(`${product.name} agregado`); }
+        
+        // Modales básicos (promo, gift, policy)
+        const promoModal = document.getElementById('promoModal'), closePromo = document.getElementById('closePromoBtn'), acceptPromo = document.getElementById('acceptPromoBtn'), sharePromo = document.getElementById('sharePromoBtn');
+        function openPromo() { promoModal.classList.add('active'); } function closePromoModal() { promoModal.classList.remove('active'); }
+        closePromo.addEventListener('click', closePromoModal); acceptPromo.addEventListener('click', closePromoModal); promoModal.addEventListener('click', (e) => { if (e.target === promoModal) closePromoModal(); });
+        sharePromo.addEventListener('click', async () => { try { if (navigator.share) await navigator.share({ title: 'Claro Colombia', text: '¡iPhone con 20% OFF pagando con Nequi/BRE-B!', url: location.href }); else await navigator.clipboard.writeText(location.href); showToast('Enlace copiado'); } catch(e) { showToast('No se pudo compartir'); } });
+        const giftModal = document.getElementById('giftModal'), closeGift = document.getElementById('closeGiftBtn'), giftOptions = document.querySelectorAll('.gift-option'), confirmGift = document.getElementById('confirmGiftBtn'); let selectedGift = null;
+        function openGiftModal() { if (hasGift()) { showToast('Ya tienes un regalo.'); pendingProduct = null; return; } giftModal.classList.add('active'); selectedGift = null; giftOptions.forEach(opt => opt.classList.remove('selected')); }
         function closeGiftModal() { giftModal.classList.remove('active'); pendingProduct = null; }
-        giftOptions.forEach(opt => opt.addEventListener('click', () => {
-            giftOptions.forEach(o => o.classList.remove('selected'));
-            opt.classList.add('selected');
-            selectedGift = opt.getAttribute('data-gift');
-        }));
-        confirmGift.addEventListener('click', () => {
-            if (!selectedGift) { showToast('Selecciona un regalo'); return; }
-            if (hasGift()) { showToast('Ya existe un regalo.'); closeGiftModal(); return; }
-            addGift(selectedGift);
-            if (pendingProduct) {
-                const existing = cart.find(i => i.id === pendingProduct.id);
-                if (existing) existing.quantity++;
-                else cart.push({ id: pendingProduct.id, name: pendingProduct.name, price: pendingProduct.priceCOP, quantity: 1 });
-                updateCartUI();
-                showToast(`${pendingProduct.name} agregado + regalo ${selectedGift}`);
-                pendingProduct = null;
-            }
-            closeGiftModal();
-        });
-        closeGift.addEventListener('click', closeGiftModal);
-        giftModal.addEventListener('click', (e) => { if (e.target === giftModal) closeGiftModal(); });
-
-        const policyModal = document.getElementById('policyModal');
-        const openPolicy = document.getElementById('openPolicyBtn');
-        const closePolicy = document.getElementById('closePolicyBtn');
-        openPolicy.addEventListener('click', () => policyModal.classList.add('active'));
-        closePolicy.addEventListener('click', () => policyModal.classList.remove('active'));
-        policyModal.addEventListener('click', (e) => { if (e.target === policyModal) policyModal.classList.remove('active'); });
-
-        // ========== CHECKOUT ==========
-        const checkoutModal = document.getElementById('checkoutModal');
-        const closeCheckout = document.getElementById('closeCheckoutBtn');
-        const checkoutBtn = document.getElementById('checkoutBtnDrawer');
-        const copyNequi = document.getElementById('copyNequiBtn');
-        const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
-        const paymentMethodHidden = document.getElementById('paymentMethodHidden');
-        const balanceDueHidden = document.getElementById('balanceDueHidden');
-        const cartTotalHidden = document.getElementById('cartTotalHidden');
-        const cartDetailsHidden = document.getElementById('cartDetailsHidden');
+        giftOptions.forEach(opt => opt.addEventListener('click', () => { giftOptions.forEach(o => o.classList.remove('selected')); opt.classList.add('selected'); selectedGift = opt.getAttribute('data-gift'); }));
+        confirmGift.addEventListener('click', () => { if (!selectedGift) { showToast('Selecciona un regalo'); return; } if (hasGift()) { showToast('Ya existe un regalo.'); closeGiftModal(); return; } addGift(selectedGift); if (pendingProduct) { const existing = cart.find(i => i.id === pendingProduct.id); if (existing) existing.quantity++; else cart.push({ id: pendingProduct.id, name: pendingProduct.name, price: pendingProduct.priceCOP, quantity: 1 }); updateCartUI(); showToast(`${pendingProduct.name} + regalo ${selectedGift}`); pendingProduct = null; } closeGiftModal(); });
+        closeGift.addEventListener('click', closeGiftModal); giftModal.addEventListener('click', (e) => { if (e.target === giftModal) closeGiftModal(); });
+        const policyModal = document.getElementById('policyModal'), openPolicy = document.getElementById('openPolicyBtn'), closePolicy = document.getElementById('closePolicyBtn');
+        openPolicy.addEventListener('click', () => policyModal.classList.add('active')); closePolicy.addEventListener('click', () => policyModal.classList.remove('active')); policyModal.addEventListener('click', (e) => { if (e.target === policyModal) policyModal.classList.remove('active'); });
+        
+        // CHECKOUT con FormSubmit y limpieza completa
+        const checkoutModal = document.getElementById('checkoutModal'), closeCheckout = document.getElementById('closeCheckoutBtn'), checkoutBtn = document.getElementById('checkoutBtnDrawer');
+        const nequiCard = document.getElementById('nequiCard'), brebCard = document.getElementById('brebCard');
+        const nequiPanel = document.getElementById('nequiPanel'), brebPanel = document.getElementById('brebPanel');
+        const copyNequi = document.getElementById('copyNequi'), copyBreb = document.getElementById('copyBreb');
+        const paymentRadios = document.querySelectorAll('input[name="paymentMethodRadio"]');
         const paymentBreakdown = document.getElementById('paymentBreakdown');
-        const paymentInstruction = document.getElementById('paymentInstruction');
-        const proofHint = document.getElementById('proofHint');
-        const checkoutForm = document.getElementById('checkoutForm');
-        const fileInput = document.getElementById('paymentProofInput');
+        const orderForm = document.getElementById('orderForm');
+        const proofInput = document.getElementById('proofInput');
         const fakeLabel = document.getElementById('fakeFileLabel');
-        const submitBtn = document.getElementById('submitPaymentBtn');
-
+        
+        let currentPlatform = 'Nequi';
+        let currentModalidad = 'full';
+        let currentTotalPaid = 0;
+        let currentBalance = '0';
+        
         function getCartTotal() { return cart.reduce((a,i) => a + (i.price * i.quantity), 0); }
-        function getCartSummary() { return cart.map(i => `${i.name} x${i.quantity} = ${i.price === 0 ? 'Gratis' : formatCOP(i.price * i.quantity)}`).join('\n'); }
-
-        function updatePaymentUI() {
-            const total = getCartTotal();
-            const isPartial = document.querySelector('input[name="paymentMethod"]:checked').value === 'partial';
-            if (isPartial) {
-                const advance = Math.round(total * 0.3);
-                const balance = total - advance;
-                paymentBreakdown.innerHTML = `
-                    <div class="breakdown-item"><strong>Valor total del equipo:</strong> <span>${formatCOP(total)}</span></div>
-                    <div class="breakdown-item"><strong>🔹 Pagas hoy (30%):</strong> <span style="color:#b8102a;">${formatCOP(advance)}</span></div>
-                    <div class="breakdown-item"><strong>🚚 Pagas contra entrega (70%):</strong> <span>${formatCOP(balance)}</span></div>
-                    <div class="breakdown-item" style="margin-top:8px; font-size:0.75rem;">* El comprobante debe ser del 30% del valor total.</div>
-                `;
-                paymentInstruction.innerText = `Paga el 30% del total (${formatCOP(advance)}) por Nequi.`;
-                proofHint.innerText = 'Adjunta el comprobante del pago del 30% (captura de Nequi).';
-                cartTotalHidden.value = advance;
-                paymentMethodHidden.value = 'contra_entrega (30% anticipo)';
-                balanceDueHidden.value = formatCOP(balance);
+        function getSelectedPercentage() { return document.querySelector('input[name="paymentMethodRadio"]:checked').value === 'partial' ? 'partial' : 'full'; }
+        function updatePaymentUI() { const total = getCartTotal(); const isPartial = getSelectedPercentage() === 'partial'; if (isPartial) { const advance = Math.round(total * 0.3); const balance = total - advance; paymentBreakdown.innerHTML = `<div class="breakdown-item"><strong>Total equipo:</strong> <span>${formatCOP(total)}</span></div><div class="breakdown-item"><strong>🔹 Pagas hoy (30%):</strong> <span style="color:#b8102a;">${formatCOP(advance)}</span></div><div class="breakdown-item"><strong>🚚 Pagas contra entrega (70%):</strong> <span>${formatCOP(balance)}</span></div>`; currentTotalPaid = advance; currentBalance = formatCOP(balance); currentModalidad = 'contra_entrega (30% anticipo)'; } else { paymentBreakdown.innerHTML = `<div class="breakdown-item"><strong>Total a pagar hoy:</strong> <span>${formatCOP(total)}</span></div>`; currentTotalPaid = total; currentBalance = '0'; currentModalidad = 'pago_total'; } }
+        function setPaymentMethod(method) {
+            if (method === 'nequi') {
+                nequiCard.classList.add('selected'); brebCard.classList.remove('selected');
+                nequiPanel.style.display = 'block'; brebPanel.style.display = 'none';
+                currentPlatform = 'Nequi';
             } else {
-                paymentBreakdown.innerHTML = `<div class="breakdown-item"><strong>Total a pagar hoy:</strong> <span>${formatCOP(total)}</span></div>`;
-                paymentInstruction.innerText = `Paga el monto total ${formatCOP(total)} por Nequi.`;
-                proofHint.innerText = 'Adjunta el comprobante de pago total.';
-                cartTotalHidden.value = total;
-                paymentMethodHidden.value = 'pago_total_Nequi';
-                balanceDueHidden.value = '0';
+                brebCard.classList.add('selected'); nequiCard.classList.remove('selected');
+                nequiPanel.style.display = 'none'; brebPanel.style.display = 'block';
+                currentPlatform = 'BRE-B';
             }
         }
-
-        paymentRadios.forEach(radio => radio.addEventListener('change', updatePaymentUI));
-
-        function openCheckoutModal() {
-            if (cart.length === 0) { showToast('Carrito vacío'); return; }
-            cartDetailsHidden.value = getCartSummary();
-            updatePaymentUI();
-            checkoutModal.classList.add('active');
-        }
-        function closeCheckoutModal() { checkoutModal.classList.remove('active'); }
-        checkoutBtn.addEventListener('click', openCheckoutModal);
-        closeCheckout.addEventListener('click', closeCheckoutModal);
-        checkoutModal.addEventListener('click', (e) => { if (e.target === checkoutModal) closeCheckoutModal(); });
+        nequiCard.addEventListener('click', () => setPaymentMethod('nequi'));
+        brebCard.addEventListener('click', () => setPaymentMethod('breb'));
         copyNequi.addEventListener('click', () => { navigator.clipboard.writeText('3202112323'); showToast('Número Nequi copiado'); });
-
-        fakeLabel.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length) fakeLabel.innerHTML = `<i class="fas fa-check-circle"></i> ${fileInput.files[0].name}`;
-            else fakeLabel.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Seleccionar imagen del comprobante';
-        });
-
-        // Generación de PDF con logo y aviso en rojo
-        async function generateInvoicePDF(formDataObj, cartItems, totalAmount, method, balanceDue, paidAmount) {
+        copyBreb.addEventListener('click', () => { navigator.clipboard.writeText('@3138237540'); showToast('Llave BRE-B copiada'); });
+        paymentRadios.forEach(radio => radio.addEventListener('change', updatePaymentUI));
+        
+        async function generateInvoicePDF(customerData, cartItems, total, isPartial, paidAmount, balanceDue, platform, modalidadText) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
-            const loadLogo = () => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.crossOrigin = "Anonymous";
-                    img.src = LOGO_URL;
-                    img.onload = () => resolve(img);
-                    img.onerror = () => resolve(null);
-                });
-            };
-            const logoImg = await loadLogo();
-            
-            doc.setFillColor(227, 24, 55);
-            doc.rect(0, 0, 210, 45, 'F');
-            if (logoImg) {
-                const imgWidth = 35;
-                const imgHeight = (logoImg.height * imgWidth) / logoImg.width;
-                doc.addImage(logoImg, 'PNG', 15, 8, imgWidth, imgHeight);
-            } else {
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(22);
-                doc.setFont('helvetica', 'bold');
-                doc.text('CLARO COLOMBIA', 20, 22);
-            }
-            doc.setFontSize(12);
-            doc.setTextColor(255, 255, 255);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Factura Electrónica - iPhone Store', 20, 35);
-            doc.setFontSize(10);
-            doc.text(`Fecha: ${new Date().toLocaleString()}`, 140, 15);
-            doc.text(`Factura N°: CL-${Math.floor(Math.random() * 1000000)}`, 140, 25);
-            
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(11);
-            doc.setFont('helvetica', 'bold');
-            doc.text('DATOS DEL CLIENTE', 20, 60);
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(10);
-            doc.text(`Nombre: ${formDataObj.Nombre || ''}`, 20, 70);
-            doc.text(`Cédula: ${formDataObj.Cedula || ''}`, 20, 78);
-            doc.text(`Ciudad: ${formDataObj.Ciudad || ''} / Dir: ${formDataObj.Direccion || ''}`, 20, 86);
-            doc.text(`Teléfono: ${formDataObj.Telefono || ''}`, 20, 94);
-            if (formDataObj.Observaciones) doc.text(`Observaciones: ${formDataObj.Observaciones}`, 20, 102);
-            
-            const tableBody = cartItems.map(i => [i.name, i.quantity, i.price === 0 ? 'Gratis' : formatCOP(i.price), i.price === 0 ? '$0' : formatCOP(i.price * i.quantity)]);
-            doc.autoTable({ startY: 110, head: [['Producto', 'Cantidad', 'Precio Unit.', 'Subtotal']], body: tableBody, theme: 'striped', headStyles: { fillColor: [227, 24, 55], textColor: 255 }, margin: { left: 20, right: 20 } });
-            let finalY = doc.lastAutoTable.finalY + 10;
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'bold');
-            doc.text(`TOTAL DEL PEDIDO: ${formatCOP(totalAmount)}`, 20, finalY);
-            if (method === 'contra_entrega (30% anticipo)') {
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Método de pago: Contra entrega - 30% anticipo y 70% al recibir`, 20, finalY + 8);
-                doc.text(`Anticipo pagado hoy: ${formatCOP(paidAmount)}`, 20, finalY + 16);
-                doc.text(`Saldo pendiente contra entrega: ${balanceDue}`, 20, finalY + 24);
-            } else {
-                doc.text(`Método de pago: Pago total con Nequi - ${formatCOP(paidAmount)}`, 20, finalY + 8);
-            }
-            doc.setTextColor(200, 0, 0);
-            doc.setFontSize(11);
-            doc.setFont('helvetica', 'bold');
-            doc.text('⚠️ Pago realizado y en proceso de verificación por Claro Colombia ⚠️', 20, finalY + 34);
-            doc.setFontSize(9);
-            doc.setTextColor(150, 0, 0);
-            doc.text('Este comprobante será validado en un plazo máximo de 24 horas.', 20, finalY + 42);
+            const logoImg = await new Promise(resolve => { const img = new Image(); img.crossOrigin = "Anonymous"; img.src = LOGO_URL; img.onload = () => resolve(img); img.onerror = () => resolve(null); });
+            doc.setFillColor(227,24,55); doc.rect(0,0,210,45,'F');
+            if(logoImg) { const imgWidth=35; const imgHeight=(logoImg.height*imgWidth)/logoImg.width; doc.addImage(logoImg,'PNG',15,8,imgWidth,imgHeight); }
+            else { doc.setTextColor(255,255,255); doc.setFontSize(22); doc.text('CLARO COLOMBIA',20,22); }
+            doc.setFontSize(12); doc.setTextColor(255,255,255); doc.text('Factura Electrónica - iPhone Store',20,35);
+            doc.setFontSize(10); doc.text(`Fecha: ${new Date().toLocaleString()}`,140,15); doc.text(`Factura N°: CL-${Math.floor(Math.random()*1000000)}`,140,25);
+            doc.setTextColor(0,0,0); doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.text('DATOS DEL CLIENTE',20,60);
+            doc.setFont('helvetica','normal'); doc.setFontSize(10);
+            doc.text(`Nombre: ${customerData.Nombre}`,20,70); doc.text(`Cédula: ${customerData.Cedula}`,20,78);
+            doc.text(`Ciudad: ${customerData.Ciudad} / Dir: ${customerData.Direccion}`,20,86);
+            doc.text(`Teléfono: ${customerData.Telefono}`,20,94); if(customerData.Observaciones) doc.text(`Observaciones: ${customerData.Observaciones}`,20,102);
+            const tableBody = cartItems.map(i => [i.name, i.quantity, i.price===0?'Gratis':formatCOP(i.price), i.price===0?'$0':formatCOP(i.price*i.quantity)]);
+            doc.autoTable({ startY:110, head:[['Producto','Cantidad','Precio Unit.','Subtotal']], body:tableBody, theme:'striped', headStyles:{ fillColor:[227,24,55], textColor:255 }, margin:{ left:20, right:20 } });
+            let finalY = doc.lastAutoTable.finalY+10;
+            doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.text(`TOTAL DEL PEDIDO: ${formatCOP(total)}`,20,finalY);
+            doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.text(`Método de pago: ${platform} - ${modalidadText}`,20,finalY+8);
+            if(isPartial) { doc.text(`Anticipo pagado hoy: ${formatCOP(paidAmount)}`,20,finalY+16); doc.text(`Saldo pendiente contra entrega: ${balanceDue}`,20,finalY+24); }
+            else { doc.text(`Total pagado: ${formatCOP(paidAmount)}`,20,finalY+16); }
+            doc.setTextColor(200,0,0); doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.text('⚠️ Pago realizado y en proceso de verificación por Claro Colombia ⚠️',20,finalY+34);
+            doc.setFontSize(9); doc.setTextColor(150,0,0); doc.text('Este comprobante será validado en un plazo máximo de 24 horas.',20,finalY+42);
             doc.save(`factura_claro_${Date.now()}.pdf`);
+            showToast('Factura PDF descargada automáticamente.');
         }
-
-        const warningModal = document.getElementById('postWarningModal');
-        const closeWarning = document.getElementById('closeWarningBtn');
-        const closeWarningAction = document.getElementById('closeWarningActionBtn');
-        function showWarning() { warningModal.classList.add('active'); }
-        function closeWarningModal() { warningModal.classList.remove('active'); }
-        closeWarning.addEventListener('click', closeWarningModal);
-        closeWarningAction.addEventListener('click', closeWarningModal);
-        warningModal.addEventListener('click', (e) => { if (e.target === warningModal) closeWarningModal(); });
-
-        checkoutForm.addEventListener('submit', async (e) => {
+        
+        // Función para resetear completamente el formulario y el carrito
+        function resetCheckout() {
+            // Limpiar campos del formulario
+            document.getElementById('inputNombre').value = '';
+            document.getElementById('inputCedula').value = '';
+            document.getElementById('inputCiudad').value = '';
+            document.getElementById('inputDireccion').value = '';
+            document.getElementById('inputTelefono').value = '';
+            document.getElementById('inputObservaciones').value = '';
+            // Limpiar archivo
+            proofInput.value = '';
+            fakeLabel.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Seleccionar imagen del comprobante';
+            // Vaciar carrito
+            clearCart();
+            // Actualizar UI del carrito
+            updateCartUI();
+            // Cerrar modal
+            closeCheckoutModal();
+        }
+        
+        orderForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            if (!fileInput.files.length) { showToast('Adjunta el comprobante de pago'); return; }
-            if (cart.length === 0) { showToast('Carrito vacío'); closeCheckoutModal(); return; }
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Enviando...';
-            const formData = new FormData(checkoutForm);
-            const web3Data = new FormData();
-            web3Data.append('access_key', '51a05672-e21b-404e-b717-0c2e2780efde');
-            web3Data.append('_subject', 'NUEVO PEDIDO iPhone - Claro Colombia');
-            web3Data.append('Nombre', formData.get('Nombre') || '');
-            web3Data.append('Cedula', formData.get('Cedula') || '');
-            web3Data.append('Ciudad', formData.get('Ciudad') || '');
-            web3Data.append('Direccion', formData.get('Direccion') || '');
-            web3Data.append('Telefono', formData.get('Telefono') || '');
-            web3Data.append('Observaciones', formData.get('Observaciones') || '');
-            web3Data.append('Detalle del pedido', cartDetailsHidden.value);
-            web3Data.append('Método de pago', paymentMethodHidden.value);
-            web3Data.append('Total pagado (COP)', cartTotalHidden.value);
-            web3Data.append('Saldo pendiente (contra entrega)', balanceDueHidden.value);
-
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 15000);
-            const formSubmit = fetch('https://formsubmit.co/justincortez1621@gmail.com,claroiphone@mbox.re', { method: 'POST', body: formData, signal: controller.signal }).catch(() => ({ ok: false }));
-            const web3 = fetch('https://api.web3forms.com/submit', { method: 'POST', body: web3Data, signal: controller.signal }).catch(() => ({ ok: false }));
-            const [fsRes, w3Res] = await Promise.allSettled([formSubmit, web3]);
-            clearTimeout(timeout);
-            const fsOk = fsRes.status === 'fulfilled' && fsRes.value && fsRes.value.ok;
-            const w3Ok = w3Res.status === 'fulfilled' && w3Res.value && w3Res.value.ok;
-            if (fsOk || w3Ok) {
-                const formValues = {};
-                formData.forEach((v, k) => formValues[k] = v);
-                const cartCopy = [...cart];
-                const total = getCartTotal();
-                const paid = parseInt(cartTotalHidden.value) || 0;
-                await generateInvoicePDF(formValues, cartCopy, total, paymentMethodHidden.value, balanceDueHidden.value, paid);
-                showWarning();
-                clearCart();
-                closeCheckoutModal();
-                checkoutForm.reset();
-                fakeLabel.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Seleccionar imagen del comprobante';
-                showToast('✅ Pedido registrado. Revisa tu correo y descarga la factura.');
-            } else {
-                showToast('❌ Error al enviar el pedido. Intenta de nuevo.');
+            
+            const nombre = document.getElementById('inputNombre').value.trim();
+            const cedula = document.getElementById('inputCedula').value.trim();
+            const ciudad = document.getElementById('inputCiudad').value.trim();
+            const direccion = document.getElementById('inputDireccion').value.trim();
+            const telefono = document.getElementById('inputTelefono').value.trim();
+            const observaciones = document.getElementById('inputObservaciones').value.trim();
+            
+            if (!nombre || !cedula || !ciudad || !direccion || !telefono) {
+                showToast('Por favor completa todos los campos obligatorios (*)');
+                return;
             }
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Confirmar pago y enviar';
+            if (!proofInput.files.length) {
+                showToast('Debes adjuntar el comprobante de pago (captura de pantalla)');
+                return;
+            }
+            if (cart.length === 0) {
+                showToast('El carrito está vacío');
+                return;
+            }
+            
+            const total = getCartTotal();
+            const isPartial = getSelectedPercentage() === 'partial';
+            const paidAmount = isPartial ? Math.round(total * 0.3) : total;
+            const balanceDue = isPartial ? formatCOP(total - paidAmount) : '0';
+            const platform = currentPlatform;
+            const modalidadText = isPartial ? 'Contra entrega (30% anticipo)' : 'Pago total';
+            const cartDetail = cart.map(i => `${i.name} x${i.quantity} = ${i.price===0?'Gratis':formatCOP(i.price*i.quantity)}`).join('\n');
+            
+            // Crear FormData para enviar
+            const formData = new FormData();
+            formData.append('Nombre', nombre);
+            formData.append('Cedula', cedula);
+            formData.append('Ciudad', ciudad);
+            formData.append('Direccion', direccion);
+            formData.append('Telefono', telefono);
+            formData.append('Observaciones', observaciones);
+            formData.append('comprobante', proofInput.files[0]);
+            formData.append('Metodo de pago', platform);
+            formData.append('Modalidad de pago', modalidadText);
+            formData.append('Total pagado (COP)', paidAmount);
+            formData.append('Saldo pendiente (contra entrega)', balanceDue);
+            formData.append('Detalle del carrito', cartDetail);
+            formData.append('_subject', 'NUEVO PEDIDO iPHONE - Claro Colombia');
+            formData.append('_cc', 'claroiphone@mbox.re');
+            formData.append('_captcha', 'false');
+            formData.append('_template', 'table');
+            
+            const submitBtn = document.getElementById('submitOrderBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Enviando...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Enviar a FormSubmit
+                const response = await fetch('https://formsubmit.co/justincortez1621@gmail.com', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    // Generar factura después del envío exitoso
+                    const customerData = { Nombre: nombre, Cedula: cedula, Ciudad: ciudad, Direccion: direccion, Telefono: telefono, Observaciones: observaciones };
+                    await generateInvoicePDF(customerData, cart, total, isPartial, paidAmount, balanceDue, platform, modalidadText);
+                    
+                    showToast('✅ Pedido enviado correctamente. Revisa tu correo.');
+                    // Limpiar todo
+                    resetCheckout();
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    showToast('❌ Error al enviar el pedido. Intenta de nuevo.');
+                }
+            } catch (err) {
+                console.error('Fetch error:', err);
+                showToast('❌ Error de conexión. Revisa tu internet.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
-
-        // ========== LIGHTBOX ==========
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightboxImg');
-        const lightboxCloseBtn = document.getElementById('lightboxClose');
-        const lightboxPrevBtn = document.getElementById('lightboxPrev');
-        const lightboxNextBtn = document.getElementById('lightboxNext');
-        const lightboxCounterSpan = document.getElementById('lightboxCounter');
-        let currentImages = [], currentIdx = 0;
-        function openLightbox(images, idx) { if (!images.length) return; currentImages = images; currentIdx = idx; updateLightbox(); lightbox.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        
+        fakeLabel.addEventListener('click', () => proofInput.click());
+        proofInput.addEventListener('change', () => {
+            if (proofInput.files.length) fakeLabel.innerHTML = `<i class="fas fa-check-circle"></i> ${proofInput.files[0].name}`;
+            else fakeLabel.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Seleccionar imagen del comprobante';
+        });
+        
+        function openCheckoutModal() { if (cart.length === 0) { showToast('Carrito vacío'); return; } updatePaymentUI(); checkoutModal.classList.add('active'); }
+        function closeCheckoutModal() { checkoutModal.classList.remove('active'); }
+        checkoutBtn.addEventListener('click', openCheckoutModal); closeCheckout.addEventListener('click', closeCheckoutModal); checkoutModal.addEventListener('click', (e) => { if (e.target === checkoutModal) closeCheckoutModal(); });
+        
+        // Lightbox y render productos
+        const lightbox = document.getElementById('lightbox'), lightboxImg = document.getElementById('lightboxImg'), lightboxCloseBtn = document.getElementById('lightboxClose'), lightboxPrevBtn = document.getElementById('lightboxPrev'), lightboxNextBtn = document.getElementById('lightboxNext'), lightboxCounterSpan = document.getElementById('lightboxCounter'); let currentImages = [], currentIdx = 0;
+        function openLightbox(images, idx) { currentImages = images; currentIdx = idx; updateLightbox(); lightbox.classList.add('active'); document.body.style.overflow = 'hidden'; }
         function closeLightbox() { lightbox.classList.remove('active'); document.body.style.overflow = ''; }
         function updateLightbox() { lightboxImg.src = currentImages[currentIdx]; lightboxCounterSpan.innerText = `${currentIdx+1}/${currentImages.length}`; }
         function nextLightbox() { currentIdx = (currentIdx + 1) % currentImages.length; updateLightbox(); }
         function prevLightbox() { currentIdx = (currentIdx - 1 + currentImages.length) % currentImages.length; updateLightbox(); }
-        lightboxCloseBtn.addEventListener('click', closeLightbox);
-        lightboxPrevBtn.addEventListener('click', prevLightbox);
-        lightboxNextBtn.addEventListener('click', nextLightbox);
-        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
-        document.addEventListener('keydown', (e) => {
-            if (!lightbox.classList.contains('active')) return;
-            if (e.key === 'Escape') closeLightbox();
-            if (e.key === 'ArrowLeft') prevLightbox();
-            if (e.key === 'ArrowRight') nextLightbox();
-        });
-
-        // ========== RENDER PRODUCTOS ==========
-        function renderProducts() {
-            const grid = document.getElementById('productGrid');
-            grid.innerHTML = '';
-            products.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                let thumbsHtml = '';
-                p.imagenes.forEach((url, idx) => {
-                    thumbsHtml += `<img src="${url}" class="thumbnail ${idx === 0 ? 'active' : ''}" data-img-index="${idx}" data-product-id="${p.id}" data-full-img="${url}">`;
-                });
-                card.innerHTML = `
-                    <div class="gallery-container">
-                        <img id="mainImg-${p.id}" class="main-image" src="${p.imagenes[0]}" data-product-id="${p.id}" data-img-index="0">
-                        <div class="thumbnail-list" id="thumbs-${p.id}">${thumbsHtml}</div>
-                    </div>
-                    <div class="card-info">
-                        <div class="product-title">${p.name}</div>
-                        <div class="specs">${p.specsList.map(s => `<span>${s}</span>`).join('')}</div>
-                        <div class="price-container"><span class="old-price">${formatCOP(p.originalPrice)}</span><span class="new-price">${formatCOP(p.priceCOP)}</span></div>
-                        <button class="btn-add" data-id="${p.id}"><i class="fas fa-shopping-cart"></i> Comprar</button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-            document.querySelectorAll('.btn-add').forEach(btn => btn.addEventListener('click', () => {
-                const prod = products.find(p => p.id == btn.dataset.id);
-                if (prod) addToCart(prod);
-            }));
-            products.forEach(p => {
-                const mainImg = document.getElementById(`mainImg-${p.id}`);
-                const thumbs = document.querySelectorAll(`.thumbnail[data-product-id="${p.id}"]`);
-                thumbs.forEach(th => th.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    mainImg.src = th.src;
-                    thumbs.forEach(t => t.classList.remove('active'));
-                    th.classList.add('active');
-                    mainImg.setAttribute('data-img-index', th.dataset.imgIndex);
-                }));
-                mainImg.addEventListener('click', () => openLightbox(p.imagenes, parseInt(mainImg.dataset.imgIndex) || 0));
-                thumbs.forEach(th => th.addEventListener('click', () => openLightbox(p.imagenes, parseInt(th.dataset.imgIndex))));
-            });
-        }
-
-        // ========== INICIALIZACIÓN ==========
-        function loadCart() {
-            const saved = localStorage.getItem('claro_cart');
-            if (saved) try { cart = JSON.parse(saved); } catch(e) { cart = []; }
-            updateCartUI();
-        }
-        renderProducts();
-        loadCart();
-        window.addEventListener('load', () => setTimeout(openPromo, 500));
-        document.getElementById('closeDrawerBtn').addEventListener('click', () => {
-            document.getElementById('cartDrawer').classList.remove('open');
-            document.getElementById('cartOverlay').classList.remove('active');
-        });
-        document.getElementById('cartOverlay').addEventListener('click', () => {
-            document.getElementById('cartDrawer').classList.remove('open');
-            document.getElementById('cartOverlay').classList.remove('active');
-        });
-        document.getElementById('cartFloating').addEventListener('click', () => {
-            document.getElementById('cartDrawer').classList.add('open');
-            document.getElementById('cartOverlay').classList.add('active');
-        });
+        lightboxCloseBtn.addEventListener('click', closeLightbox); lightboxPrevBtn.addEventListener('click', prevLightbox); lightboxNextBtn.addEventListener('click', nextLightbox); lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+        
+        function renderProducts() { const grid = document.getElementById('productGrid'); grid.innerHTML = ''; products.forEach(p => { const card = document.createElement('div'); card.className = 'product-card'; let thumbsHtml = ''; p.imagenes.forEach((url, idx) => { thumbsHtml += `<img src="${url}" class="thumbnail ${idx === 0 ? 'active' : ''}" data-img-index="${idx}" data-product-id="${p.id}" data-full-img="${url}" loading="lazy">`; }); card.innerHTML = `<div class="gallery-container"><img id="mainImg-${p.id}" class="main-image" src="${p.imagenes[0]}" data-product-id="${p.id}" data-img-index="0" loading="lazy"><div class="thumbnail-list" id="thumbs-${p.id}">${thumbsHtml}</div></div><div class="card-info"><div class="product-title">${p.name}</div><div class="specs">${p.specsList.map(s => `<span>${s}</span>`).join('')}</div><div class="price-container"><span class="old-price">${formatCOP(p.originalPrice)}</span><span class="new-price">${formatCOP(p.priceCOP)}</span></div><button class="btn-add" data-id="${p.id}"><i class="fas fa-shopping-cart"></i> Comprar</button></div>`; grid.appendChild(card); }); document.querySelectorAll('.btn-add').forEach(btn => btn.addEventListener('click', () => { const prod = products.find(p => p.id == btn.dataset.id); if (prod) addToCart(prod); })); products.forEach(p => { const mainImg = document.getElementById(`mainImg-${p.id}`); const thumbs = document.querySelectorAll(`.thumbnail[data-product-id="${p.id}"]`); thumbs.forEach(th => th.addEventListener('click', (e) => { e.stopPropagation(); mainImg.src = th.src; thumbs.forEach(t => t.classList.remove('active')); th.classList.add('active'); mainImg.setAttribute('data-img-index', th.dataset.imgIndex); })); mainImg.addEventListener('click', () => openLightbox(p.imagenes, parseInt(mainImg.dataset.imgIndex) || 0)); thumbs.forEach(th => th.addEventListener('click', () => openLightbox(p.imagenes, parseInt(th.dataset.imgIndex)))); }); }
+        function loadCart() { const saved = localStorage.getItem('claro_cart'); if (saved) try { cart = JSON.parse(saved); } catch(e) { cart = []; } updateCartUI(); }
+        renderProducts(); loadCart(); window.addEventListener('load', () => setTimeout(openPromo, 500));
+        document.getElementById('closeDrawerBtn').addEventListener('click', () => { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('active'); });
+        document.getElementById('cartOverlay').addEventListener('click', () => { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('active'); });
+        document.getElementById('cartFloating').addEventListener('click', () => { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('cartOverlay').classList.add('active'); });
     })();
 </script>
 </body>
